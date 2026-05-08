@@ -199,6 +199,7 @@ const Map = ({
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/boards/markers`)
       .then((res) => {
+        console.log("마커 데이터 로드 성공:", res.data);
         setMarkerList(res.data);
       })
       .catch((err) => {
@@ -410,6 +411,8 @@ const Map = ({
         if (detailMode) {
           map.setCenter(
             new window.naver.maps.LatLng(
+              // 클릭 시 detailMode true일 경우 마커위치를 조금 아래로
+              // 고쳐서 마커 정보창이 지도맵 중심에 오도록 하기 위해 lat에 0.003 더함
               markerName.getPosition().lat() + 0.003,
               markerName.getPosition().lng(),
             ),
@@ -417,7 +420,7 @@ const Map = ({
           map.setZoom(15);
           markerName.setIcon({
             content: `
-            <div>
+            <div> // 마커 + 클릭 시 나타나는 오브젝트를 감싼 제일 바깥 태그
               <div style="position: relative; width: 100%;">
                 <div
                 style="
@@ -452,8 +455,12 @@ const Map = ({
                     "
                   />
                 </div>
+                // 위치한 주소를 marker 객체의 addr 필드에서 가져와서 표시
                 <p>${marker.addr}</p>
               </div>
+              // 위치한 주소를 띄어주는 오브젝트 아래 해당 게시물 작성자,
+              // 닉네임, 받은 하트 수, 게시물 제목, 게시물 내용 일부를
+              // 띄우는 오브젝트
               <div
                 style="
                   position: absolute;
@@ -488,8 +495,8 @@ const Map = ({
                       style=" display: flex; gap: 8px; align-items: center; "
                     >
                       <img
-                        loading="lazy"
-                        decoding="async"
+                        loading="lazy" // 로딩속도를 빠르게 하기 위해 lazy 로딩 적용
+                        decoding="async" // 디코딩을 비동기로 처리하기 위함
                         src=${marker.memberThumb || defaultImg}
                         alt=""
                         style="
@@ -520,6 +527,7 @@ const Map = ({
                 </div>
               </div>
               <div style=" padding: 8px 4px; line-height: 1; ">
+                // 게시물 제목을 10자까지만 보여주고, 내용은 30자까지만 보여주기 위함
                 <div style=" text-align: left; ">${marker.boardTitle.substring(0, 10)}</div>
                   <div
                     style="
@@ -548,18 +556,26 @@ const Map = ({
               loading="lazy"
               decoding="async"
               src=${marker.memberThumb || defaultImg}
-              style="width: 38px; height: 36px; object-fit: cover; border-radius: 50%;margin: 0px; padding: 0px; z-index:${2 + i}; border: 0px solid transparent; display: block; min-width: 38px; min-height: none; -webkit-user-select: none; position: absolute; left: 0px; top: 0px; transform: translate(15%, 15%);"
+              style="width: 38px; height: 36px; object-fit: cover; border-radius: \
+              50%;margin: 0px; padding: 0px; z-index:${2 + i}; border: 0px solid \
+              transparent; display: block; min-width: 38px; min-height: none; \
+              -webkit-user-select: none; position: absolute; left: 0px; top: 0px; \
+              transform: translate(15%, 15%);"
             />
             <img
               loading="lazy"
               decoding="async"
               src='src/assets/img/defaultthumbmarker.png'
-              style="width: 30px; margin: 0px; padding: 0px; border: 0px solid transparent; display: block; min-width: 50px; min-height: none; -webkit-user-select: none; z-index:${1 + i}; position: absolute; left: 0px; top: 0px;"
+              style="width: 30px; margin: 0px; padding: 0px; border: 0px solid \
+              transparent; display: block; min-width: 50px; min-height: none; \
+              -webkit-user-select: none; z-index:${1 + i}; position: absolute; \
+              left: 0px; top: 0px;"
             />
           </div>
           <button
                   type="button"
-                  onclick="event.stopPropagation(); window.openRegionChart && window.openRegionChart();"
+                  onclick="event.stopPropagation(); window.openRegionChart && \
+                  window.openRegionChart();"
                   style="
                     border-radius: 999px;
                     border: 1px solid rgba(255,255,255,0.4);
@@ -594,13 +610,20 @@ const Map = ({
               loading="lazy"
               decoding="async"
               src=${marker.memberThumb || defaultImg}
-              style="width: 38px; height: 36px; object-fit: cover; border-radius: 50%;margin: 0px; padding: 0px; z-index:${2 + i}; border: 0px solid transparent; display: block; min-width: 38px; min-height: none; -webkit-user-select: none; position: absolute; left: 0px; top: 0px; transform: translate(15%, 15%);"
+              style="width: 38px; height: 36px; object-fit: cover; border-radius: \
+              50%;margin: 0px; padding: 0px; z-index:${2 + i}; border: 0px solid \
+              transparent; display: block; min-width: 38px; min-height: none; \
+              -webkit-user-select: none; position: absolute; left: 0px; top: 0px; \
+              transform: translate(15%, 15%);"
             />
             <img
               loading="lazy"
               decoding="async"
               src='src/assets/img/defaultthumbmarker.png'
-              style="width: 30px; margin: 0px; padding: 0px; border: 0px solid transparent; display: block; min-width: 50px; min-height: none; -webkit-user-select: none; z-index:${1 + i}; position: absolute; left: 0px; top: 0px;"
+              style="width: 30px; margin: 0px; padding: 0px; border: 0px solid \
+              transparent; display: block; min-width: 50px; min-height: none; \
+              -webkit-user-select: none; z-index:${1 + i}; position: absolute; \
+              left: 0px; top: 0px;"
             />
           </div>`,
             size: new naver.maps.Size(22, 35),

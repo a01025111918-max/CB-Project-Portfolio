@@ -29,11 +29,7 @@ const RankList = () => {
                 <p>{i + 1}</p>
                 <p>
                   <img
-                    src={
-                      rank.memberThumb
-                        ? normalizeImageUrl(rank.memberThumb, "member/thumb")
-                        : defaultImg
-                    }
+                    src={rank.memberThumb ? defaultImg : defaultImg}
                     className={styles.list_thumb}
                     loading="lazy"
                     decoding="async"

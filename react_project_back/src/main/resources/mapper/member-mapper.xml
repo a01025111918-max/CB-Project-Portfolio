@@ -196,7 +196,7 @@ fetch first 1 row only
 </update>
 
 <select id="selectClist" resultType="Member">
-	select member_thumb, member_nickname, member_co2 from member_tbl1 where member_co2 is not null order by member_co2 desc
+	select member_thumb, member_nickname, member_co2 from member_tbl1 where member_co2 is not null and member_id != 'admin00' order by member_co2 desc
 	offset 0 rows fetch next 15 rows only
 </select>
 
