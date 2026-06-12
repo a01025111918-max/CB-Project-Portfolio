@@ -126,25 +126,34 @@ public class BoardController {
 	// 에디터 이미지 업로드 기능임. 업로드된 파일을 서버에 저장하고 URL 경로를 리턴함.
 	@PostMapping("/editor/upload")
 	public String uploadEditorImage(@RequestParam("upfile") MultipartFile upfile) {
-		// 업로드 파일이 없으면 예외 처리
 		if (upfile == null || upfile.isEmpty()) {
 			throw new RuntimeException("업로드할 파일이 없습니다.");
 		}
 
-		// application.properties에 설정된 root 경로 아래 board/editor 폴더로 저장함.
-		// 예: file.root=./upload/semiproject/ 인 경우 실제 저장 경로는
-		// react_project_back/upload/semiproject/board/editor 가 됩니다.
-		File saveDir = new File(new File(root), "board/editor");
-		if (!saveDir.exists()) {
-			saveDir.mkdirs();
-		}
-
-		// Firebase Storage에 업로드하고, 저장된 스토리지 경로를 반환받음.
-		String fileName = FileUtils.upload(saveDir.getAbsolutePath() + File.separator, upfile);
+		String fileName = FileUtils.upload("board/editor", upfile);
 
 		return fileName;
 	}
-	 
+	// public String uploadEditorImage(@RequestParam("upfile") MultipartFile upfile) {
+	// 	// 업로드 파일이 없으면 예외 처리
+	// 	if (upfile == null || upfile.isEmpty()) {
+	// 		throw new RuntimeException("업로드할 파일이 없습니다.");
+	// 	}
+
+	// 	// application.properties에 설정된 root 경로 아래 board/editor 폴더로 저장함.
+	// 	// 예: file.root=./upload/semiproject/ 인 경우 실제 저장 경로는
+	// 	// react_project_back/upload/semiproject/board/editor 가 됩니다.
+	// 	File saveDir = new File(new File(root), "board/editor");
+	// 	if (!saveDir.exists()) {
+	// 		saveDir.mkdirs();
+	// 	}
+
+	// 	// Firebase Storage에 업로드하고, 저장된 스토리지 경로를 반환받음.
+	// 	String fileName = FileUtils.upload(saveDir.getAbsolutePath() + File.separator, upfile);
+
+	// 	return fileName;
+	// }
+	
 	// 수정
 	 // 게시글 수정 요청을 처리하는 API임.
 	 // 1) 요청 보낸 사람이 해당 게시글 작성자인지 검사하고,

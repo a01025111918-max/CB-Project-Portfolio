@@ -59,18 +59,14 @@ public class SupportContoller {
 	}
 	
 	@PostMapping(value="qna")
-	public ResponseEntity<?> insertQna(@ModelAttribute Qna qna, @RequestParam(value="upfile", required = false) MultipartFile upfile) {
-		if(upfile != null && !upfile.isEmpty()) {
-			File saveDir = new File(new File(root), "qna");
-			if (!saveDir.exists()) {
-				saveDir.mkdir();
-			}
-			String fileName = FileUtils.upload(saveDir.getAbsolutePath() + File.separator, upfile);
-			qna.setQnaQuestionImage(fileName);
-		}
-		int result = supportService.insertQna(qna);
-		return ResponseEntity.ok(result);
-	}
+public ResponseEntity<?> insertQna(@ModelAttribute Qna qna, @RequestParam(value="upfile", required = false) MultipartFile upfile) {
+    if (upfile != null && !upfile.isEmpty()) {
+        String fileName = FileUtils.upload("qna", upfile);
+        qna.setQnaQuestionImage(fileName);
+    }
+    int result = supportService.insertQna(qna);
+    return ResponseEntity.ok(result);
+}
 	
 	@GetMapping(value="qna/{qnaNo}")
 	public ResponseEntity<?> selectQanDetail(@PathVariable Integer qnaNo) {
