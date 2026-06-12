@@ -33,7 +33,9 @@ const Login = () => {
     });
   };
 
-  const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+  const BACKSERVER =
+    import.meta.env.VITE_BACKSERVER ||
+    "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
   const handleLogin = async () => {
     console.log("로그인 버튼 클릭됨"); // 버튼 클릭 테스트용 출력

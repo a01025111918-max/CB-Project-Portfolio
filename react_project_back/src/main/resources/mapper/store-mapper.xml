@@ -16,7 +16,7 @@
   <insert id="insertBoardForStore"
           parameterType="kr.co.iei.store.model.vo.StoreBoard">
     <selectKey keyProperty="boardNo" resultType="int" order="BEFORE">
-      SELECT ISEQ$$_80822.NEXTVAL FROM DUAL
+      SELECT BOARD_SEQ.NEXTVAL FROM DUAL
     </selectKey>
     INSERT INTO BOARD_TBL
     (

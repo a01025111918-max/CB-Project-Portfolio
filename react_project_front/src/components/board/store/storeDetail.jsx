@@ -8,15 +8,37 @@ import userImg from "../../../assets/user.png";
 import styles from "./storeDetail.module.css";
 import storeStyles from "./store.module.css";
 
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 const DELIVERY_FEE = 5000;
 
-const formatPrice = (value) => `${Number(value || 0).toLocaleString("ko-KR")}원`;
-const parsePriceToNumber = (value) => Number(String(value || "").replace(/[^0-9]/g, "")) || 0;
+const formatPrice = (value) =>
+  `${Number(value || 0).toLocaleString("ko-KR")}원`;
+const parsePriceToNumber = (value) =>
+  Number(String(value || "").replace(/[^0-9]/g, "")) || 0;
 const normalizeTradeType = (tradeType) => {
-  if (tradeType === 0 || tradeType === "0" || tradeType === "직거래/택배" || String(tradeType).trim() === "직거래/택배") return "직거래/택배";
-  if (tradeType === 1 || tradeType === "1" || tradeType === "직거래" || String(tradeType).trim() === "직거래") return "직거래";
-  if (tradeType === 2 || tradeType === "2" || tradeType === "택배" || String(tradeType).trim() === "택배") return "택배";
+  if (
+    tradeType === 0 ||
+    tradeType === "0" ||
+    tradeType === "직거래/택배" ||
+    String(tradeType).trim() === "직거래/택배"
+  )
+    return "직거래/택배";
+  if (
+    tradeType === 1 ||
+    tradeType === "1" ||
+    tradeType === "직거래" ||
+    String(tradeType).trim() === "직거래"
+  )
+    return "직거래";
+  if (
+    tradeType === 2 ||
+    tradeType === "2" ||
+    tradeType === "택배" ||
+    String(tradeType).trim() === "택배"
+  )
+    return "택배";
   return null;
 };
 
@@ -25,8 +47,18 @@ const getTradeTypeLabel = (tradeType) => {
   return normalized || "미정";
 };
 const getSaleStatusLabel = (productStatus) => {
-  if (productStatus === "예약중" || productStatus === 1 || productStatus === "1") return "예약중";
-  if (productStatus === "판매완료" || productStatus === 2 || productStatus === "2") return "판매완료";
+  if (
+    productStatus === "예약중" ||
+    productStatus === 1 ||
+    productStatus === "1"
+  )
+    return "예약중";
+  if (
+    productStatus === "판매완료" ||
+    productStatus === 2 ||
+    productStatus === "2"
+  )
+    return "판매완료";
   return "판매중";
 };
 
@@ -34,7 +66,9 @@ const getSaleStatusLabel = (productStatus) => {
 // 백엔드에서 숫자 1, 문자열 "1", 또는 true 같은 다양한 값이 올 수 있기 때문에,
 // 모두 비공개 댓글로 처리하도록 통일합니다.
 const isSecretComment = (comment) =>
-  comment?.isPrivate === 1 || comment?.isPrivate === "1" || comment?.isPrivate === true;
+  comment?.isPrivate === 1 ||
+  comment?.isPrivate === "1" ||
+  comment?.isPrivate === true;
 
 // 댓글 목록을 받아서 비공개 여부 필드를 boolean으로 정규화합니다.
 // 이후 렌더링 시 항상 동일한 조건으로 비공개 댓글을 처리할 수 있습니다.
@@ -79,7 +113,13 @@ const StoreDetail = () => {
       user?.memberName?.trim() ||
       user?.writerName?.trim();
     if (!name || ["null", "undefined"].includes(name.toLowerCase())) {
-      return user?.memberId || user?.writerId || user?.buyerId || user?.sellerId || "";
+      return (
+        user?.memberId ||
+        user?.writerId ||
+        user?.buyerId ||
+        user?.sellerId ||
+        ""
+      );
     }
     return name;
   };
@@ -93,11 +133,19 @@ const StoreDetail = () => {
   //  - 성공하면 성공 메시지를 보여주고, 실패하면 오류 메시지를 보여줌.
   const handleAddToCart = async () => {
     if (!memberId) {
-      Swal.fire({ icon: "info", title: "로그인 필요", text: "찜하기 위해 로그인해주세요." });
+      Swal.fire({
+        icon: "info",
+        title: "로그인 필요",
+        text: "찜하기 위해 로그인해주세요.",
+      });
       return;
     }
     if (!item?.marketNo) {
-      Swal.fire({ icon: "error", title: "오류", text: "상품 정보를 찾을 수 없습니다." });
+      Swal.fire({
+        icon: "error",
+        title: "오류",
+        text: "상품 정보를 찾을 수 없습니다.",
+      });
       return;
     }
 
@@ -108,7 +156,11 @@ const StoreDetail = () => {
         marketNo: item.marketNo,
         quantity: 1,
       });
-      Swal.fire({ icon: "success", title: "찜하기 완료", text: "상품이 찜한 상품에 추가되었습니다." });
+      Swal.fire({
+        icon: "success",
+        title: "찜하기 완료",
+        text: "상품이 찜한 상품에 추가되었습니다.",
+      });
     } catch (error) {
       console.error("찜하기 실패", error);
       Swal.fire({
@@ -126,11 +178,12 @@ const StoreDetail = () => {
       try {
         setIsLoading(true);
         await axios.get(`${BACKSERVER}/api/store/boards/${itemId}/read`);
-        const [detailResponse, listResponse, commentsResponse] = await Promise.all([
-          axios.get(`${BACKSERVER}/api/store/boards/${itemId}`),
-          axios.get(`${BACKSERVER}/api/store/boards`),
-          axios.get(`${BACKSERVER}/api/store/boards/${itemId}/reviews`),
-        ]);
+        const [detailResponse, listResponse, commentsResponse] =
+          await Promise.all([
+            axios.get(`${BACKSERVER}/api/store/boards/${itemId}`),
+            axios.get(`${BACKSERVER}/api/store/boards`),
+            axios.get(`${BACKSERVER}/api/store/boards/${itemId}/reviews`),
+          ]);
         setItem(detailResponse.data);
         setStoreList(Array.isArray(listResponse.data) ? listResponse.data : []);
         // 댓글을 불러올 때마다 비공개 플래그를 정규화하여
@@ -158,7 +211,9 @@ const StoreDetail = () => {
     if (!itemId) return;
     axios
       .get(`${BACKSERVER}/api/store/markets/${itemId}/ratings`)
-      .then((res) => setTransactionReviews(Array.isArray(res.data) ? res.data : []))
+      .then((res) =>
+        setTransactionReviews(Array.isArray(res.data) ? res.data : []),
+      )
       .catch((error) => {
         console.error("거래 후기 조회 실패", error);
         setTransactionReviews([]);
@@ -179,7 +234,9 @@ const StoreDetail = () => {
       .get(`${BACKSERVER}/api/members/${item.memberId}`)
       .then((res) => {
         if (res.data?.memberThumb) {
-          setItem((prev) => (prev ? { ...prev, memberThumb: res.data.memberThumb } : prev));
+          setItem((prev) =>
+            prev ? { ...prev, memberThumb: res.data.memberThumb } : prev,
+          );
         }
       })
       .catch((error) => {
@@ -201,15 +258,21 @@ const StoreDetail = () => {
   }, [item]);
 
   const totalSellerRatingScore = useMemo(() => {
-    return sellerRatings.reduce((sum, rating) => sum + Number(rating.rating || 0), 0);
+    return sellerRatings.reduce(
+      (sum, rating) => sum + Number(rating.rating || 0),
+      0,
+    );
   }, [sellerRatings]);
 
   const itemTradeSetting = useMemo(() => {
     if (!item) return { direct: true, delivery: true };
     const normalizedTradeType = normalizeTradeType(item.tradeType);
-    if (normalizedTradeType === "직거래/택배") return { direct: true, delivery: true };
-    if (normalizedTradeType === "직거래") return { direct: true, delivery: false };
-    if (normalizedTradeType === "택배") return { direct: false, delivery: true };
+    if (normalizedTradeType === "직거래/택배")
+      return { direct: true, delivery: true };
+    if (normalizedTradeType === "직거래")
+      return { direct: true, delivery: false };
+    if (normalizedTradeType === "택배")
+      return { direct: false, delivery: true };
     return { direct: true, delivery: true };
   }, [item]);
 
@@ -265,7 +328,9 @@ const StoreDetail = () => {
 
   const refreshComments = async () => {
     try {
-      const response = await axios.get(`${BACKSERVER}/api/store/boards/${itemId}/reviews`);
+      const response = await axios.get(
+        `${BACKSERVER}/api/store/boards/${itemId}/reviews`,
+      );
       // 댓글 목록을 새로고침할 때에도 비공개 플래그를 일관되게 유지합니다.
       setComments(normalizeComments(response.data));
     } catch (error) {
@@ -334,9 +399,12 @@ const StoreDetail = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${BACKSERVER}/api/store/boards/${itemId}/reviews/${comment.reviewNo}`, {
-        params: { memberId },
-      });
+      await axios.delete(
+        `${BACKSERVER}/api/store/boards/${itemId}/reviews/${comment.reviewNo}`,
+        {
+          params: { memberId },
+        },
+      );
       await refreshComments();
     } catch (error) {
       console.error("댓글 삭제 실패", error);
@@ -394,12 +462,15 @@ const StoreDetail = () => {
     if (!text) return;
 
     try {
-      await axios.put(`${BACKSERVER}/api/store/boards/${itemId}/reviews/${editingTarget.reviewNo}`, {
-        reviewContent: text,
-        memberId,
-        memberNickname,
-        isPrivate: editingPrivate ? 1 : 0,
-      });
+      await axios.put(
+        `${BACKSERVER}/api/store/boards/${itemId}/reviews/${editingTarget.reviewNo}`,
+        {
+          reviewContent: text,
+          memberId,
+          memberNickname,
+          isPrivate: editingPrivate ? 1 : 0,
+        },
+      );
       setEditingTarget(null);
       setEditingText("");
       setEditingPrivate(false);
@@ -419,7 +490,11 @@ const StoreDetail = () => {
     return (
       <section className={styles.detail_wrap}>
         <h1>중고장터</h1>
-        <p>{isLoading ? "상품 정보를 불러오는 중입니다." : loadError || "해당 상품을 찾을 수 없습니다."}</p>
+        <p>
+          {isLoading
+            ? "상품 정보를 불러오는 중입니다."
+            : loadError || "해당 상품을 찾을 수 없습니다."}
+        </p>
         <Link to="/store" className={styles.back_link}>
           ← 목록으로 돌아가기
         </Link>
@@ -428,17 +503,28 @@ const StoreDetail = () => {
   }
 
   const sameProducts = storeList.filter(
-    (product) => product.marketTitle === item.marketTitle && product.marketNo !== item.marketNo,
+    (product) =>
+      product.marketTitle === item.marketTitle &&
+      product.marketNo !== item.marketNo,
   );
-  const displaySame = sameProducts.length > 0 ? sameProducts.slice(0, 6) : storeList.filter((product) => product.marketNo !== item.marketNo).slice(0, 6);
+  const displaySame =
+    sameProducts.length > 0
+      ? sameProducts.slice(0, 6)
+      : storeList
+          .filter((product) => product.marketNo !== item.marketNo)
+          .slice(0, 6);
   const displayTitle = `[${saleStatus}] ${item.marketTitle}`;
   const isAuthor = memberId && item?.memberId === memberId;
 
   const updateProductStatus = async (statusCode) => {
     try {
-      await axios.patch(`${BACKSERVER}/api/store/boards/${itemId}/status`, null, {
-        params: { status: statusCode, memberId },
-      });
+      await axios.patch(
+        `${BACKSERVER}/api/store/boards/${itemId}/status`,
+        null,
+        {
+          params: { status: statusCode, memberId },
+        },
+      );
     } catch (error) {
       console.error("상품 상태 업데이트 실패", error);
       throw error;
@@ -453,7 +539,10 @@ const StoreDetail = () => {
 
   const handleChangeSaleStatus = async (status) => {
     if (!isAuthor) {
-      Swal.fire({ icon: "warning", title: "작성자만 상태를 변경할 수 있습니다." });
+      Swal.fire({
+        icon: "warning",
+        title: "작성자만 상태를 변경할 수 있습니다.",
+      });
       return;
     }
 
@@ -509,7 +598,8 @@ const StoreDetail = () => {
     }
 
     const baseAmount = parsePriceToNumber(item.productPrice);
-    const finalAmount = deliveryMethod === "delivery" ? baseAmount + DELIVERY_FEE : baseAmount;
+    const finalAmount =
+      deliveryMethod === "delivery" ? baseAmount + DELIVERY_FEE : baseAmount;
     navigate("/payment/order", {
       state: {
         itemId,
@@ -633,13 +723,14 @@ const StoreDetail = () => {
               if (imageUrl) {
                 return (
                   <img
-                    src={imageUrl}
+                    src={getImageUrl(item.productThumb) || "/no-image.svg"}
                     alt={item.marketTitle || "상품 이미지"}
                     className={styles.product_image}
                     loading="lazy"
                     decoding="async"
                     onError={(e) => {
-                      e.currentTarget.style.display = "none";
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/no-image.svg";
                     }}
                   />
                 );
@@ -665,11 +756,18 @@ const StoreDetail = () => {
               </button>
             )}
           </div>
-          <div className={styles.region_badge}>{item.regionName || item.ctpvsggId || "미등록"}</div>
+          <div className={styles.region_badge}>
+            {item.regionName || item.ctpvsggId || "미등록"}
+          </div>
           <div className={styles.authorRow}>
             <img
               className={styles.authorAvatar}
-              src={getMemberImageUrl(item.memberThumb || (item.memberId === memberId ? memberThumb : null)) || userImg}
+              src={
+                getMemberImageUrl(
+                  item.memberThumb ||
+                    (item.memberId === memberId ? memberThumb : null),
+                ) || userImg
+              }
               alt="작성자 프로필"
               onError={(e) => {
                 e.currentTarget.src = userImg;
@@ -691,7 +789,9 @@ const StoreDetail = () => {
             <div className={styles.delivery_options}>
               <label
                 className={
-                  supportDirect ? styles.delivery_option : `${styles.delivery_option} ${styles.disabledOption}`
+                  supportDirect
+                    ? styles.delivery_option
+                    : `${styles.delivery_option} ${styles.disabledOption}`
                 }
               >
                 <input
@@ -706,7 +806,9 @@ const StoreDetail = () => {
               </label>
               <label
                 className={
-                  supportDelivery ? styles.delivery_option : `${styles.delivery_option} ${styles.disabledOption}`
+                  supportDelivery
+                    ? styles.delivery_option
+                    : `${styles.delivery_option} ${styles.disabledOption}`
                 }
               >
                 <input
@@ -721,13 +823,17 @@ const StoreDetail = () => {
               </label>
             </div>
             {!deliveryMethod && supportDirect && supportDelivery && (
-              <p style={{ marginTop: 8, color: "#5a5a5a", fontSize: "0.95rem" }}>
+              <p
+                style={{ marginTop: 8, color: "#5a5a5a", fontSize: "0.95rem" }}
+              >
                 양쪽 거래가 가능할 때는 먼저 거래방법을 선택해주세요.
               </p>
             )}
           </div>
 
-          <div className={styles.info_box}>상품 상태 : {item.productStatus || "미등록"}</div>
+          <div className={styles.info_box}>
+            상품 상태 : {item.productStatus || "미등록"}
+          </div>
 
           {isAuthor ? (
             <div className={styles.action_row}>
@@ -737,12 +843,24 @@ const StoreDetail = () => {
                 onClick={() => handleChangeSaleStatus("예약중")}
                 disabled={saleStatus === "판매완료"}
               >
-                {saleStatus === "예약중" ? "판매중으로 변경" : "예약중으로 변경"}
+                {saleStatus === "예약중"
+                  ? "판매중으로 변경"
+                  : "예약중으로 변경"}
               </button>
-              <button type="button" className={styles.edit_button} onClick={handleEdit} disabled={saleStatus === "판매완료"}>
+              <button
+                type="button"
+                className={styles.edit_button}
+                onClick={handleEdit}
+                disabled={saleStatus === "판매완료"}
+              >
                 수정
               </button>
-              <button type="button" className={styles.delete_button} onClick={handleDelete} disabled={saleStatus === "판매완료"}>
+              <button
+                type="button"
+                className={styles.delete_button}
+                onClick={handleDelete}
+                disabled={saleStatus === "판매완료"}
+              >
                 삭제
               </button>
             </div>
@@ -759,7 +877,11 @@ const StoreDetail = () => {
                   >
                     🛒 찜하기
                   </button>
-                  <button type="button" className={styles.buy_button} onClick={handleGoToPayment}>
+                  <button
+                    type="button"
+                    className={styles.buy_button}
+                    onClick={handleGoToPayment}
+                  >
                     구매하기
                   </button>
                 </>
@@ -776,7 +898,9 @@ const StoreDetail = () => {
 
       <div className={styles.section_box}>
         <h3>상품정보</h3>
-        <p className={styles.productContent}>{item.marketContent || `${item.marketTitle} 상품 상세 안내 ...`}</p>
+        <p className={styles.productContent}>
+          {item.marketContent || `${item.marketTitle} 상품 상세 안내 ...`}
+        </p>
       </div>
 
       <div className={styles.section_box}>
@@ -790,20 +914,30 @@ const StoreDetail = () => {
         <div className={styles.comment_section}>
           <h3>거래 후기</h3>
           <div className={styles.comment_list}>
-            {transactionReviews.length === 0 && <p>등록된 거래 후기가 없습니다.</p>}
+            {transactionReviews.length === 0 && (
+              <p>등록된 거래 후기가 없습니다.</p>
+            )}
             {transactionReviews.map((comment) => {
               const imageUrl = getSafeImageUrl(comment.reviewThumb);
               return (
                 <div
                   key={comment.reviewNo}
                   className={styles.comment_item}
-                  style={{ marginLeft: `${(comment.commentDepth || 0) * 20}px` }}
+                  style={{
+                    marginLeft: `${(comment.commentDepth || 0) * 20}px`,
+                  }}
                 >
                   <div className={styles.review_header}>
-                    <span className={styles.review_author}>{getDisplayName(comment)}</span>
-                    <span className={styles.review_score}>★ {comment.rating ?? 0}점</span>
+                    <span className={styles.review_author}>
+                      {getDisplayName(comment)}
+                    </span>
+                    <span className={styles.review_score}>
+                      ★ {comment.rating ?? 0}점
+                    </span>
                   </div>
-                  <p className={styles.comment_meta}>{formatCommentDate(comment.createdAt)}</p>
+                  <p className={styles.comment_meta}>
+                    {formatCommentDate(comment.createdAt)}
+                  </p>
                   <p className={styles.comment_text}>{comment.reviewContent}</p>
                   {imageUrl && (
                     <div className={styles.review_image_wrap}>
@@ -812,7 +946,8 @@ const StoreDetail = () => {
                         src={imageUrl}
                         alt="거래 후기 이미지"
                         onError={(e) => {
-                          e.currentTarget.style.display = "none";
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/no-image.svg";
                         }}
                       />
                     </div>
@@ -837,32 +972,47 @@ const StoreDetail = () => {
               >
                 <article className={`${storeStyles.card} ${styles.same_item}`}>
                   <div className={storeStyles.image}>
-                    {imageUrl ? (
-                      <img
-                        src={imageUrl}
-                        alt={same.marketTitle || "상품 이미지"}
-                        loading="lazy"
-                        decoding="async"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      "이미지"
-                    )}
+                    <img
+                      src={
+                        getImageUrl(same.productThumb || same.thumb) ||
+                        "/no-image.svg"
+                      }
+                      alt={same.marketTitle || "상품 이미지"}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/no-image.svg";
+                      }}
+                    />
                   </div>
                   <h3>{same.marketTitle}</h3>
-                  <p className={storeStyles.price}>{formatPrice(same.productPrice)}</p>
-                  <div className={storeStyles.region_badge}>{same.regionName || same.ctpvsggId || "지역 미등록"}</div>
-                  <p className={storeStyles.tradeType}>거래방법 : {getTradeTypeLabel(same.tradeType)}</p>
-                  <div className={storeStyles.metaRow}>
-                    <span className={storeStyles.author}>{getDisplayName(same)}</span>
-                    <span className={storeStyles.metaDivider}>|</span>
-                    <span className={storeStyles.commentCount}>💬 {same.commentCount ?? 0}</span>
-                    <span className={storeStyles.metaDivider}>|</span>
-                    <span className={storeStyles.dateLine}>{same.createdAt ? formatCommentDate(same.createdAt) : ""}</span>
+                  <p className={storeStyles.price}>
+                    {formatPrice(same.productPrice)}
+                  </p>
+                  <div className={storeStyles.region_badge}>
+                    {same.regionName || same.ctpvsggId || "지역 미등록"}
                   </div>
-                  <p className={storeStyles.viewCount}>👀 조회수 {Number(same.readCount ?? 0).toLocaleString("ko-KR")}</p>
+                  <p className={storeStyles.tradeType}>
+                    거래방법 : {getTradeTypeLabel(same.tradeType)}
+                  </p>
+                  <div className={storeStyles.metaRow}>
+                    <span className={storeStyles.author}>
+                      {getDisplayName(same)}
+                    </span>
+                    <span className={storeStyles.metaDivider}>|</span>
+                    <span className={storeStyles.commentCount}>
+                      💬 {same.commentCount ?? 0}
+                    </span>
+                    <span className={storeStyles.metaDivider}>|</span>
+                    <span className={storeStyles.dateLine}>
+                      {same.createdAt ? formatCommentDate(same.createdAt) : ""}
+                    </span>
+                  </div>
+                  <p className={storeStyles.viewCount}>
+                    👀 조회수{" "}
+                    {Number(same.readCount ?? 0).toLocaleString("ko-KR")}
+                  </p>
                 </article>
               </Link>
             );
@@ -880,7 +1030,8 @@ const StoreDetail = () => {
             const isOwn = comment.memberId && memberId === comment.memberId;
             const isBoardAuthor = memberId && item?.memberId === memberId;
             const parentAuthorId = comment.parentCommentNo
-              ? comments.find((c) => c.reviewNo === comment.parentCommentNo)?.memberId
+              ? comments.find((c) => c.reviewNo === comment.parentCommentNo)
+                  ?.memberId
               : null;
             const isSecret = isSecretComment(comment);
             const canViewSecret =
@@ -888,8 +1039,15 @@ const StoreDetail = () => {
               isOwn ||
               isBoardAuthor ||
               parentAuthorId === memberId;
-            const displayContent = isSecret && !canViewSecret ? "비공개 댓글입니다." : comment.reviewContent;
-            const commentAvatarUrl = getMemberImageUrl(comment.memberThumb || (comment.memberId === memberId ? memberThumb : null)) || userImg;
+            const displayContent =
+              isSecret && !canViewSecret
+                ? "비공개 댓글입니다."
+                : comment.reviewContent;
+            const commentAvatarUrl =
+              getMemberImageUrl(
+                comment.memberThumb ||
+                  (comment.memberId === memberId ? memberThumb : null),
+              ) || userImg;
             return (
               <div
                 key={comment.reviewNo}
@@ -909,8 +1067,11 @@ const StoreDetail = () => {
                       }}
                     />
                     <span>
-                      {getDisplayName(comment)} · {formatCommentDate(comment.createdAt)}
-                      {isSecret && <span className={styles.reply_badge}>비공개</span>}
+                      {getDisplayName(comment)} ·{" "}
+                      {formatCommentDate(comment.createdAt)}
+                      {isSecret && (
+                        <span className={styles.reply_badge}>비공개</span>
+                      )}
                       {isCommentEdited(comment) && (
                         <span className={styles.comment_update_info}>
                           수정됨 · {formatCommentDateTime(comment.updatedAt)}
@@ -923,16 +1084,23 @@ const StoreDetail = () => {
                       type="button"
                       className={`${styles.report_icon_button} ${reportedCommentIds[comment.reviewNo] ? styles.reported : ""}`}
                       onClick={() => handleReportComment(comment.reviewNo)}
-                      title={reportedCommentIds[comment.reviewNo] ? "신고 완료" : "댓글 신고"}
+                      title={
+                        reportedCommentIds[comment.reviewNo]
+                          ? "신고 완료"
+                          : "댓글 신고"
+                      }
                     >
                       <span className="material-icons">
-                        {reportedCommentIds[comment.reviewNo] ? "report" : "report_gmailerrorred"}
+                        {reportedCommentIds[comment.reviewNo]
+                          ? "report"
+                          : "report_gmailerrorred"}
                       </span>
                     </button>
                   )}
                 </p>
 
-                {editingTarget && editingTarget.reviewNo === comment.reviewNo ? (
+                {editingTarget &&
+                editingTarget.reviewNo === comment.reviewNo ? (
                   <div className={styles.comment_edit_wrap}>
                     <input
                       value={editingText}
@@ -959,15 +1127,24 @@ const StoreDetail = () => {
                 )}
 
                 <div className={styles.comment_actions}>
-                  <button type="button" onClick={() => startReplyToComment(comment)}>
+                  <button
+                    type="button"
+                    onClick={() => startReplyToComment(comment)}
+                  >
                     답글
                   </button>
                   {isOwn && (
                     <>
-                      <button type="button" onClick={() => startEditComment(comment)}>
+                      <button
+                        type="button"
+                        onClick={() => startEditComment(comment)}
+                      >
                         수정
                       </button>
-                      <button type="button" onClick={() => handleDeleteComment(comment)}>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteComment(comment)}
+                      >
                         삭제
                       </button>
                     </>
@@ -988,7 +1165,9 @@ const StoreDetail = () => {
                 e.currentTarget.src = userImg;
               }}
             />
-            <span>{memberNickname || memberId || "비회원"} | 절약점수 : 00</span>
+            <span>
+              {memberNickname || memberId || "비회원"} | 절약점수 : 00
+            </span>
           </div>
           {replyTarget && (
             <div className={styles.reply_form}>

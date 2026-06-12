@@ -20,7 +20,9 @@ import { Autoplay, EffectFade } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
 const getSaleStatusLabel = (productStatus) => {
   if (
@@ -579,14 +581,18 @@ const Main = () => {
                   <li key={item.marketNo ?? item.boardNo ?? index}>
                     <Link to={`/store/${item.marketNo}`}>
                       <div className="used_item_image" aria-hidden="true">
-                        {imageUrl ? (
+                        <div className="used_item_image" aria-hidden="true">
                           <img
                             loading="lazy"
                             decoding="async"
-                            src={imageUrl}
+                            src={imageUrl || "/no-image.svg"}
                             alt={item.marketTitle || "상품 이미지"}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "/no-image.svg";
+                            }}
                           />
-                        ) : null}
+                        </div>
                       </div>
                       <div className="used_item_info">
                         <strong>

@@ -31,7 +31,9 @@ import { Line } from "react-chartjs-2";
 
 // 백엔드 API 서버 주소를 환경 변수에서 읽어오고, 없으면 로컬 주소를 기본값으로 사용함.
 // 프론트엔드와 백엔드가 분리되어 있어도 환경별로 주소를 쉽게 바꾸기 위함임.
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
 // 이미지 URL 정규화 도구를 가져와서 마커 이미지나 사용자 썸네일을 올바른 경로로 변환함.
 const getImageUrl = normalizeImageUrl;

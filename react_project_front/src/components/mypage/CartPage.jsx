@@ -5,11 +5,14 @@ import useAuthStore from "../../store/useAuthStore";
 import styles from "./CartPage.module.css";
 import { normalizeImageUrl } from "../../utils/getImageUrl";
 
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
 const getImageUrl = normalizeImageUrl;
 
-const formatPrice = (value) => `${Number(value || 0).toLocaleString("ko-KR")}원`;
+const formatPrice = (value) =>
+  `${Number(value || 0).toLocaleString("ko-KR")}원`;
 
 // 찜한 상품 페이지임.
 //  - 사용자가 관심 있어 하는 상품을 모아두는 목록임.
@@ -47,7 +50,8 @@ const CartPage = () => {
   }, [memberId]);
 
   const totalAmount = useMemo(
-    () => cartItems.reduce((sum, item) => sum + Number(item.productPrice || 0), 0),
+    () =>
+      cartItems.reduce((sum, item) => sum + Number(item.productPrice || 0), 0),
     [cartItems],
   );
 
@@ -77,7 +81,10 @@ const CartPage = () => {
       <div className={styles.cart_wrap}>
         <h2 className={styles.cart_title}>찜한 상품</h2>
         <p className={styles.cart_empty}>
-          로그인 후 찜한 상품을 이용하실 수 있습니다. <Link className={styles.cart_link} to="/members/login">로그인</Link>
+          로그인 후 찜한 상품을 이용하실 수 있습니다.{" "}
+          <Link className={styles.cart_link} to="/members/login">
+            로그인
+          </Link>
         </p>
       </div>
     );
@@ -86,7 +93,9 @@ const CartPage = () => {
   return (
     <div className={styles.cart_wrap}>
       <h2 className={styles.cart_title}>찜한 상품</h2>
-      <p className={styles.cart_subtitle}>찜한 상품을 클릭하면 중고장터 상세페이지로 이동합니다.</p>
+      <p className={styles.cart_subtitle}>
+        찜한 상품을 클릭하면 중고장터 상세페이지로 이동합니다.
+      </p>
       {isLoading ? (
         <div className={styles.cart_empty}>로딩 중입니다...</div>
       ) : errorMessage ? (
@@ -105,8 +114,14 @@ const CartPage = () => {
             {cartItems.map((item) => {
               const imageUrl = getImageUrl(item.productThumb);
               return (
-                <div key={item.cartNo ?? item.marketNo} className={styles.cart_item}>
-                  <Link to={`/store/${item.marketNo}`} className={styles.cart_link}>
+                <div
+                  key={item.cartNo ?? item.marketNo}
+                  className={styles.cart_item}
+                >
+                  <Link
+                    to={`/store/${item.marketNo}`}
+                    className={styles.cart_link}
+                  >
                     <div className={styles.cart_item_image_wrap}>
                       {imageUrl ? (
                         <img
@@ -122,13 +137,22 @@ const CartPage = () => {
                     </div>
                   </Link>
                   <div className={styles.cart_item_content}>
-                    <Link to={`/store/${item.marketNo}`} className={styles.cart_link}>
-                      <h3 className={styles.cart_item_title}>{item.marketTitle || "상품명 없음"}</h3>
+                    <Link
+                      to={`/store/${item.marketNo}`}
+                      className={styles.cart_link}
+                    >
+                      <h3 className={styles.cart_item_title}>
+                        {item.marketTitle || "상품명 없음"}
+                      </h3>
                     </Link>
                     {item.quantity > 1 && (
-                      <p className={styles.cart_item_meta}>수량: {item.quantity}</p>
+                      <p className={styles.cart_item_meta}>
+                        수량: {item.quantity}
+                      </p>
                     )}
-                    <p className={styles.cart_item_price}>{formatPrice(item.productPrice)}</p>
+                    <p className={styles.cart_item_price}>
+                      {formatPrice(item.productPrice)}
+                    </p>
                   </div>
                   <div className={styles.cart_item_actions}>
                     <button

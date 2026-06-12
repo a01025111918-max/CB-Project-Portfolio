@@ -3,7 +3,9 @@ import axios from "axios";
 import useAuthStore from "../../store/useAuthStore";
 import styles from "./MyPoint.module.css";
 
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
 const MyPoint = () => {
   const { memberId } = useAuthStore();

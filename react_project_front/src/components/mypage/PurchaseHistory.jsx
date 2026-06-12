@@ -6,7 +6,9 @@ import styles from "./PurchaseHistory.module.css";
 import { getCompletedPurchases } from "./orderHistoryStorage";
 import { normalizeImageUrl } from "../../utils/getImageUrl";
 
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 const PAGE_SIZE = 6;
 const getStatusPrefix = (status) => (status ? `[${status}] ` : "");
 
@@ -35,17 +37,26 @@ const resolveTradeType = (type, typeText, deliveryMethod, address) => {
   const addressExists = Boolean((address ?? "").toString().trim());
 
   if (normalized === "0" || normalized === "직거래/택배") {
-    if (deliveryMethod === "delivery" || deliveryMethod === "택배" || addressExists) return "택배";
-    if (deliveryMethod === "direct" || deliveryMethod === "직거래") return "직거래";
+    if (
+      deliveryMethod === "delivery" ||
+      deliveryMethod === "택배" ||
+      addressExists
+    )
+      return "택배";
+    if (deliveryMethod === "direct" || deliveryMethod === "직거래")
+      return "직거래";
     return "직거래/택배";
   }
-  if (normalized === "1" || normalized === "직거래" || normalized === "direct") return "직거래";
-  if (normalized === "2" || normalized === "택배" || normalized === "delivery") return "택배";
+  if (normalized === "1" || normalized === "직거래" || normalized === "direct")
+    return "직거래";
+  if (normalized === "2" || normalized === "택배" || normalized === "delivery")
+    return "택배";
   return addressExists ? "택배" : "직거래";
 };
 
 const getTradeTypeLabel = (item, tradeInfo) => {
-  const address = item.orderInfo?.address || item.address || tradeInfo?.address || "";
+  const address =
+    item.orderInfo?.address || item.address || tradeInfo?.address || "";
   const tradeType = tradeInfo?.tradeType ?? item.tradeType;
   const tradeTypeText = tradeInfo?.tradeTypeText ?? item.tradeTypeText;
   const deliveryMethod = tradeInfo?.deliveryMethod ?? item.deliveryMethod;
@@ -63,7 +74,12 @@ const getPurchaseTradeStatusLabel = (status) => {
 
 const isDeliveryTrade = (item) => {
   const address = item.orderInfo?.address || item.address || "";
-  const resolved = resolveTradeType(item.tradeType, item.tradeTypeText, item.deliveryMethod, address);
+  const resolved = resolveTradeType(
+    item.tradeType,
+    item.tradeTypeText,
+    item.deliveryMethod,
+    address,
+  );
   return resolved === "택배" || resolved === "직거래/택배";
 };
 
@@ -94,11 +110,13 @@ const PurchaseHistory = () => {
         const serverItems = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data.items)
-          ? res.data.items
-          : [];
+            ? res.data.items
+            : [];
         const localItems = memberId ? getCompletedPurchases(memberId) : [];
         const existingKeys = new Set(
-          serverItems.map((item) => String(item.tradeNo ?? item.marketNo ?? item.id ?? "")),
+          serverItems.map((item) =>
+            String(item.tradeNo ?? item.marketNo ?? item.id ?? ""),
+          ),
         );
         const combinedItems = serverItems.concat(
           localItems.filter((item) => {
@@ -126,8 +144,13 @@ const PurchaseHistory = () => {
   }, [memberId]);
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
-    const currentItems = purchaseHistory.slice((currentPage - 1) * PAGE_SIZE, (currentPage - 1) * PAGE_SIZE + PAGE_SIZE);
+    const backendUrl =
+      import.meta.env.VITE_BACKSERVER ||
+      "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
+    const currentItems = purchaseHistory.slice(
+      (currentPage - 1) * PAGE_SIZE,
+      (currentPage - 1) * PAGE_SIZE + PAGE_SIZE,
+    );
 
     const fetchTradeInfo = async (marketNo) => {
       const url = `${backendUrl}/api/store/markets/${marketNo}/trade-info`;
@@ -147,7 +170,9 @@ const PurchaseHistory = () => {
 
     const fetchBoardInfo = async (marketNo) => {
       try {
-        const res = await axios.get(`${backendUrl}/api/store/boards/${marketNo}`);
+        const res = await axios.get(
+          `${backendUrl}/api/store/boards/${marketNo}`,
+        );
         return res.data;
       } catch {
         return null;
@@ -164,15 +189,25 @@ const PurchaseHistory = () => {
         ),
       );
 
-      const tradeMarketNos = marketNos.filter((marketNo) => !(marketNo in tradeInfoMap));
-      const boardMarketNos = marketNos.filter((marketNo) => !(marketNo in boardInfoMap));
+      const tradeMarketNos = marketNos.filter(
+        (marketNo) => !(marketNo in tradeInfoMap),
+      );
+      const boardMarketNos = marketNos.filter(
+        (marketNo) => !(marketNo in boardInfoMap),
+      );
 
-      const tradeResults = tradeMarketNos.length > 0
-        ? await Promise.all(tradeMarketNos.map((marketNo) => fetchTradeInfo(marketNo)))
-        : [];
-      const boardResults = boardMarketNos.length > 0
-        ? await Promise.all(boardMarketNos.map((marketNo) => fetchBoardInfo(marketNo)))
-        : [];
+      const tradeResults =
+        tradeMarketNos.length > 0
+          ? await Promise.all(
+              tradeMarketNos.map((marketNo) => fetchTradeInfo(marketNo)),
+            )
+          : [];
+      const boardResults =
+        boardMarketNos.length > 0
+          ? await Promise.all(
+              boardMarketNos.map((marketNo) => fetchBoardInfo(marketNo)),
+            )
+          : [];
 
       if (tradeMarketNos.length > 0) {
         setTradeInfoMap((prev) => {
@@ -218,89 +253,133 @@ const PurchaseHistory = () => {
           <span>{purchaseHistory.length}건</span>
         </div>
         <div className={styles.purchase_list}>
-          {purchaseHistory.length === 0 && <p>실제 결제 완료 내역이 없습니다.</p>}
+          {purchaseHistory.length === 0 && (
+            <p>실제 결제 완료 내역이 없습니다.</p>
+          )}
           {currentItems.map((item) => {
-          const purchaseId = item.tradeNo ?? item.id ?? item.marketNo ?? `${item.buyerId || "unknown"}-${item.createdAt || item.date || Math.random()}`;
-          const marketNo = item.marketNo ?? item.id ?? item.tradeNo;
-          const tradeInfo = marketNo ? tradeInfoMap[marketNo] : null;
-          const boardInfo = marketNo ? boardInfoMap[marketNo] : null;
-          const displayShippingStatus = tradeInfo?.shippingStatus ?? item.shippingStatus;
-          const displayCourierCode = tradeInfo?.courierCode ?? item.courierCode;
-          const displayInvoiceNumber = tradeInfo?.invoiceNumber ?? item.invoiceNumber;
-          const address = item.orderInfo?.address || item.address || "";
-          const displayTradeType = getTradeTypeLabel(item, tradeInfo);
-          const hasDelivery = displayTradeType === "택배" || displayTradeType === "직거래/택배";
-          const itemTitle = boardInfo?.marketTitle || item.title || item.marketTitle || item.orderName || "상품 이미지";
-          const imageUrl = getImageUrl(boardInfo?.productThumb || item.productThumb || item.thumb || tradeInfo?.productThumb);
-          const displayAmount = item.tradePrice ?? item.amount ?? item.orderPrice ?? 0;
-          const displayStatus = getPurchaseTradeStatusLabel(item.status ?? item.tradeStatus);
-          const displayDate = item.completedAt ?? item.createdAt ?? item.date;
+            const purchaseId =
+              item.tradeNo ??
+              item.id ??
+              item.marketNo ??
+              `${item.buyerId || "unknown"}-${item.createdAt || item.date || Math.random()}`;
+            const marketNo = item.marketNo ?? item.id ?? item.tradeNo;
+            const tradeInfo = marketNo ? tradeInfoMap[marketNo] : null;
+            const boardInfo = marketNo ? boardInfoMap[marketNo] : null;
+            const displayShippingStatus =
+              tradeInfo?.shippingStatus ?? item.shippingStatus;
+            const displayCourierCode =
+              tradeInfo?.courierCode ?? item.courierCode;
+            const displayInvoiceNumber =
+              tradeInfo?.invoiceNumber ?? item.invoiceNumber;
+            const address = item.orderInfo?.address || item.address || "";
+            const displayTradeType = getTradeTypeLabel(item, tradeInfo);
+            const hasDelivery =
+              displayTradeType === "택배" || displayTradeType === "직거래/택배";
+            const itemTitle =
+              boardInfo?.marketTitle ||
+              item.title ||
+              item.marketTitle ||
+              item.orderName ||
+              "상품 이미지";
+            const imageUrl = getImageUrl(
+              boardInfo?.productThumb ||
+                item.productThumb ||
+                item.thumb ||
+                tradeInfo?.productThumb,
+            );
+            const displayAmount =
+              item.tradePrice ?? item.amount ?? item.orderPrice ?? 0;
+            const displayStatus = getPurchaseTradeStatusLabel(
+              item.status ?? item.tradeStatus,
+            );
+            const displayDate = item.completedAt ?? item.createdAt ?? item.date;
 
-          return (
-            <Link
-              key={purchaseId}
-              to={`/mypage/history/purchase/${purchaseId}`}
-              className={styles.purchase_card}
-            >
-              <div className={styles.purchase_card_image_wrap}>
-                {imageUrl ? (
-                  <img
-                    loading="lazy"
-                    decoding="async"
-                    src={imageUrl}
-                    alt={itemTitle}
-                    className={styles.purchase_card_image}
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                ) : (
-                  <div className={styles.purchase_card_image_fallback}>이미지</div>
+            return (
+              <Link
+                key={purchaseId}
+                to={`/mypage/history/purchase/${purchaseId}`}
+                className={styles.purchase_card}
+              >
+                <div className={styles.purchase_card_image_wrap}>
+                  {imageUrl ? (
+                    <img
+                      loading="lazy"
+                      decoding="async"
+                      src={imageUrl}
+                      alt={itemTitle}
+                      className={styles.purchase_card_image}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div className={styles.purchase_card_image_fallback}>
+                      이미지
+                    </div>
+                  )}
+                </div>
+                <div className={styles.purchase_card_title}>
+                  {getStatusPrefix(displayStatus)}
+                  {itemTitle}
+                </div>
+                <div className={styles.purchase_card_meta}>
+                  {displayDate} · {displayStatus}
+                </div>
+                <div className={styles.purchase_card_detail}>
+                  {displayAmount?.toLocaleString("ko-KR")}원
+                </div>
+                <div className={styles.purchase_card_detail}>
+                  거래방법: {displayTradeType}
+                </div>
+                {hasDelivery && (
+                  <>
+                    <div className={styles.purchase_card_detail}>
+                      배송 상태: {getShippingStatusLabel(displayShippingStatus)}
+                    </div>
+                    <div className={styles.purchase_card_detail}>
+                      택배사: {getCourierLabel(displayCourierCode)}
+                    </div>
+                    {displayInvoiceNumber ? (
+                      <div className={styles.purchase_card_detail}>
+                        송장번호: {displayInvoiceNumber}
+                      </div>
+                    ) : null}
+                  </>
                 )}
-              </div>
-              <div className={styles.purchase_card_title}>{getStatusPrefix(displayStatus)}{itemTitle}</div>
-              <div className={styles.purchase_card_meta}>{displayDate} · {displayStatus}</div>
-              <div className={styles.purchase_card_detail}>{displayAmount?.toLocaleString("ko-KR")}원</div>
-              <div className={styles.purchase_card_detail}>거래방법: {displayTradeType}</div>
-              {hasDelivery && (
-                <>
-                  <div className={styles.purchase_card_detail}>배송 상태: {getShippingStatusLabel(displayShippingStatus)}</div>
-                  <div className={styles.purchase_card_detail}>택배사: {getCourierLabel(displayCourierCode)}</div>
-                  {displayInvoiceNumber ? <div className={styles.purchase_card_detail}>송장번호: {displayInvoiceNumber}</div> : null}
-                </>
-              )}
-            </Link>
-          );
-        })}
-      </div>
-      {pageCount > 1 && (
-        <div className={styles.pagination}>
-        <button
-          type="button"
-          onClick={() => changePage(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          &lt;
-        </button>
-        {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => (
-          <button
-            key={page}
-            type="button"
-            className={currentPage === page ? styles.activePage : ""}
-            onClick={() => changePage(page)}
-          >
-            {page}
-          </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => changePage(currentPage + 1)}
-          disabled={currentPage === pageCount}
-        >
-          &gt;
-        </button>
-      </div>
-      )}
+              </Link>
+            );
+          })}
+        </div>
+        {pageCount > 1 && (
+          <div className={styles.pagination}>
+            <button
+              type="button"
+              onClick={() => changePage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              &lt;
+            </button>
+            {Array.from({ length: pageCount }, (_, index) => index + 1).map(
+              (page) => (
+                <button
+                  key={page}
+                  type="button"
+                  className={currentPage === page ? styles.activePage : ""}
+                  onClick={() => changePage(page)}
+                >
+                  {page}
+                </button>
+              ),
+            )}
+            <button
+              type="button"
+              onClick={() => changePage(currentPage + 1)}
+              disabled={currentPage === pageCount}
+            >
+              &gt;
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );

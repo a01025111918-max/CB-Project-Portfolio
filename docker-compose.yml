@@ -1,0 +1,59 @@
+services:
+  # ── Backend (Spring Boot) ────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./react_project_back
+      dockerfile: Dockerfile
+    container_name: semi-backend
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    environment:
+      # Oracle DB
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@${DB_HOST}:1521/${DB_SERVICE}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      # JWT
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_EXPIRE_HOUR: ${JWT_EXPIRE_HOUR}
+
+      # Email (Gmail SMTP)
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      # Gemini API
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+
+      # 파일 업로드 경로 (Linux 컨테이너용)
+      FILE_ROOT: /app/uploads/semiproject/
+
+    volumes:
+      - semi-uploads:/app/uploads/semiproject
+
+    networks:
+      - semi-net
+
+  # ── Frontend (React + Nginx) ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./react_project_front
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKSERVER: ${VITE_BACKSERVER}
+        VITE_NAVER_MAP_KEY: ${VITE_NAVER_MAP_KEY}
+    container_name: semi-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - semi-net
+
+volumes:
+  semi-uploads:
+
+networks:
+  semi-net:
+    driver: bridge

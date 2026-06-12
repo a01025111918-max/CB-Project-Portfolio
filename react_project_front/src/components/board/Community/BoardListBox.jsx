@@ -9,11 +9,16 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatIcon from "@mui/icons-material/Chat";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
 const getDisplayName = (user) => {
   const name = user?.writerNickname || user?.memberNickname;
-  if (!name || ["null", "undefined"].includes(String(name).trim().toLowerCase())) {
+  if (
+    !name ||
+    ["null", "undefined"].includes(String(name).trim().toLowerCase())
+  ) {
     return user?.writerId || user?.memberId || "";
   }
   return name;
@@ -111,26 +116,21 @@ const BoardListBox = ({
                           그도 없으면 기본 user.png로 대체함. */}
                         <img
                           src={
-                            getAvatarUrl(
-                              board.memberThumb ||
-                                board.writerThumb ||
-                                board.profileThumb ||
-                                (board.writerId === memberId
-                                  ? memberThumb
-                                  : null),
-                            ) || userImg
+                            getImageUrl(
+                              board.thumbnailUrl || board.boardThumb,
+                            ) || "/no-image.svg"
                           }
+                          alt="썸네일"
+                          className={styles.boardThumbnail}
+                          loading="lazy"
+                          decoding="async"
                           onError={(e) => {
-                            const target = e.currentTarget;
-                            target.onerror = null;
-                            target.src = userImg;
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/no-image.svg";
                           }}
-                          alt="작성자"
                           className={styles.writerAvatar}
                         />
-                        <span>
-                          {getDisplayName(board)}
-                        </span>
+                        <span>{getDisplayName(board)}</span>
                       </div>
                       <div className={styles.boardDate}>
                         {board.createDate || board.boardDate}
@@ -159,13 +159,20 @@ const BoardListBox = ({
                           대역폭을 아끼고 스크롤 성능을 개선함.
                         */}
                         <img
-                          src={getImageUrl(
-                            board.thumbnailUrl || board.boardThumb,
-                          )}
+                          src={
+                            getImageUrl(
+                              board.thumbnailUrl || board.boardThumb,
+                            ) || "/no-image.svg"
+                          }
                           alt="썸네일"
                           className={styles.boardThumbnail}
                           loading="lazy"
                           decoding="async"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/no-image.svg";
+                          }}
+                          className={styles.boardThumbnail}
                         />
                       </div>
                     )}

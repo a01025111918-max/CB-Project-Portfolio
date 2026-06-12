@@ -1,8 +1,12 @@
 // 이미지 경로를 통일해서 처리하는 공용 유틸 파일임.
 // 로컬 정적 경로는 더 이상 백엔드로 직접 요청하지 않고,
 // 가능하면 Firebase URL로 변환해서 쓰도록 설계함.
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
-const FIREBASE_BUCKET = import.meta.env.VITE_FIREBASE_BUCKET || "semiproject-carbon.firebasestorage.app";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
+const FIREBASE_BUCKET =
+  import.meta.env.VITE_FIREBASE_BUCKET ||
+  "semiproject-carbon.firebasestorage.app";
 
 export const isAbsoluteUrl = (url) => {
   return typeof url === "string" && /^(https?:)?\/\//i.test(url.trim());
@@ -73,13 +77,15 @@ export const normalizeImageUrl = (thumb, defaultPrefix = "board/editor") => {
   if (!thumb || typeof thumb !== "string") return null;
   let trimmed = thumb.trim();
   if (!trimmed) return null;
-  if (["null", "undefined", "none", "NONE", "NULL"].includes(trimmed)) return null;
+  if (["null", "undefined", "none", "NONE", "NULL"].includes(trimmed))
+    return null;
 
   // Windows 경로 구분자도 모두 슬래시(/)로 통일함.
   trimmed = trimmed.replace(/\\\\/g, "/").replace(/\\/g, "/");
 
   // 이미 전체 URL이면 그대로 반환.
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://"))
+    return trimmed;
   if (trimmed.startsWith("//")) return `https:${trimmed}`;
 
   // 윈도 경로 드라이브명이 있으면 제거함.

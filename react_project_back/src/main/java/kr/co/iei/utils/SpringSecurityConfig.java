@@ -50,7 +50,9 @@ public class SpringSecurityConfig {
         // allowCredentials(true) 설정과 함께 allowedOrigins("*")를 쓰면 에러가 발생합니다.
         // 브라우저는 자격 증명 포함 CORS 응답에 대해 Access-Control-Allow-Origin: *를 허용하지 않으므로,
         // 명시적인 origin 목록 대신 allowedOriginPatterns를 사용하여 허용 출처를 지정합니다.
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://127.0.0.1:5173","http://192.168.31.28:5173", "http://localhost:9999", "http://localhost:3000", "http://127.0.0.1:3000"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://127.0.0.1:5173","http://192.168.31.28:5173", "http://localhost:9999", "http://localhost:3000", "http://127.0.0.1:3000",
+    "http://ec2-13-124-xxx-xxx.ap-northeast-2.compute.amazonaws.com",
+    "http://ec2-13-124-xxx-xxx.ap-northeast-2.compute.amazonaws.com:80"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT","PATCH" ,"DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

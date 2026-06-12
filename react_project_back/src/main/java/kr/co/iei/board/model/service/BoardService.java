@@ -252,29 +252,20 @@ public class BoardService {
 	// 게시글 첨부파일 저장 기능임. 여러 파일을 서버에 업로드하고 DB에 경로를 저장함.
 	@Transactional
 	public int insertBoardFiles(int boardNo, String memberId, MultipartFile[] files) {
-	    int result = 0;
-	    File saveDir = new File(new File(root), "board/files");
-	    if (!saveDir.exists()) {
-	        saveDir.mkdirs();
-	    }
+		int result = 0;
+		for (MultipartFile file : files) {
+			if (file == null || file.isEmpty()) continue;
 
-	    for (MultipartFile file : files) {
-	        if (file == null || file.isEmpty()) {
-	            continue;
-	        }
+			String filePath = FileUtils.upload("board/files", file);  // ← 수정
 
-	        String filePath = FileUtils.upload(saveDir.getAbsolutePath() + File.separator, file);
-
-	        BoardFile boardFile = new BoardFile();
-	        boardFile.setBoardNo(boardNo);
-	        boardFile.setMemberId(memberId);
-	        boardFile.setBoardFileName(filePath);
-	        boardFile.setBoardFilePath(filePath);
-
-	        result += boardDao.insertBoardFile(boardFile);
-	    }
-
-	    return result;
+			BoardFile boardFile = new BoardFile();
+			boardFile.setBoardNo(boardNo);
+			boardFile.setMemberId(memberId);
+			boardFile.setBoardFileName(filePath);
+			boardFile.setBoardFilePath(filePath);
+			result += boardDao.insertBoardFile(boardFile);
+		}
+		return result;
 	}
 	// 인기 게시글 조회 비즈니스 로직
 	// BoardController.bestBoardList()에서 호출되어 DAO에서 결과를 가져옵니다.

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 // WebConfig는 CORS 정책만 처리함.
@@ -33,13 +34,19 @@ public class WebConfig implements WebMvcConfigurer {
 	}
 	
 	
-	 @Override                                                                                                         
-     public void addInterceptors(InterceptorRegistry registry) {                                                     
-         registry.addInterceptor(memberStatusInterceptor)
-                 .addPathPatterns("/**")           // 모든 요청에 적용
-                 .excludePathPatterns("/members/login", "/admins/**"); // 로그인만 제외 (로그인 로직에 따로 추가해뒀음)       
-         
-         registry.addInterceptor(adminInterceptor)
-         		 .addPathPatterns("/admins/**");
-     }
+	 @Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(memberStatusInterceptor)
+				.addPathPatterns("/**")
+				.excludePathPatterns("/members/login", "/admins/**", "/files/**"); // ← 추가
+		
+		registry.addInterceptor(adminInterceptor)
+				.addPathPatterns("/admins/**");
+	}
+
+	@Override
+public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("/files/**")
+            .addResourceLocations("file:C:/Temp/semiproject/");  // ← 끝에 / 있는지 확인
+}
 }

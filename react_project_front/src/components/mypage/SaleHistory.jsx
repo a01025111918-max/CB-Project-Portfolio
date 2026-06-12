@@ -8,7 +8,10 @@ import styles from "./SaleHistory.module.css";
 
 const PAGE_SIZE = 3;
 
-const normalizeStatus = (status) => String(status ?? "").replace(/\s+/g, "").trim();
+const normalizeStatus = (status) =>
+  String(status ?? "")
+    .replace(/\s+/g, "")
+    .trim();
 
 // 판매내역 페이지임.
 //  - 판매자가 등록한 상품과 거래 상태를 확인할 수 있는 화면.
@@ -18,7 +21,12 @@ const getSaleStatusLabel = (productStatus) => {
   const normalized = normalizeStatus(productStatus);
   if (normalized === "0" || normalized === "판매중") return "판매중";
   if (normalized === "1" || normalized === "예약중") return "예약중";
-  if (normalized === "2" || normalized === "판매완료" || normalized === "구매완료") return "판매완료";
+  if (
+    normalized === "2" ||
+    normalized === "판매완료" ||
+    normalized === "구매완료"
+  )
+    return "판매완료";
   return "판매중";
 };
 
@@ -89,18 +97,32 @@ const resolveTradeType = (type, typeText, deliveryMethod, address) => {
   const addressExists = Boolean((address ?? "").toString().trim());
 
   if (normalized === "0" || normalized === "직거래/택배") {
-    if (deliveryMethod === "delivery" || deliveryMethod === "택배" || addressExists) return "택배";
-    if (deliveryMethod === "direct" || deliveryMethod === "직거래") return "직거래";
+    if (
+      deliveryMethod === "delivery" ||
+      deliveryMethod === "택배" ||
+      addressExists
+    )
+      return "택배";
+    if (deliveryMethod === "direct" || deliveryMethod === "직거래")
+      return "직거래";
     return "직거래/택배";
   }
-  if (normalized === "1" || normalized === "직거래" || normalized === "direct") return "직거래";
-  if (normalized === "2" || normalized === "택배" || normalized === "delivery") return "택배";
+  if (normalized === "1" || normalized === "직거래" || normalized === "direct")
+    return "직거래";
+  if (normalized === "2" || normalized === "택배" || normalized === "delivery")
+    return "택배";
   return addressExists ? "택배" : "직거래";
 };
 
 const getTradeTypeLabel = (item, tradeInfo) => {
-  const address = item.orderInfo?.address || item.address || tradeInfo?.address || "";
-  return resolveTradeType(item.tradeType, item.tradeTypeText, item.deliveryMethod, address);
+  const address =
+    item.orderInfo?.address || item.address || tradeInfo?.address || "";
+  return resolveTradeType(
+    item.tradeType,
+    item.tradeTypeText,
+    item.deliveryMethod,
+    address,
+  );
 };
 
 const getShippingStatusValue = (item, tradeInfo) => {
@@ -113,7 +135,11 @@ const getShippingStatusValue = (item, tradeInfo) => {
 // 택배 거래이면서 송장번호가 없거나 배송상태가 완료가 아니면 배송대기로 보고함.
 const isDeliveryPendingTrade = (item, tradeInfo) => {
   const tradeStatus = item.tradeStatus ?? tradeInfo?.tradeStatus;
-  if (tradeStatus != null && String(tradeStatus) !== "0" && String(tradeStatus) !== "1") {
+  if (
+    tradeStatus != null &&
+    String(tradeStatus) !== "0" &&
+    String(tradeStatus) !== "1"
+  ) {
     return false;
   }
 
@@ -136,7 +162,11 @@ const getImageUrl = normalizeImageUrl;
 
 const getBoardForMarketNo = (marketNo, boards) => {
   if (!marketNo) return null;
-  return boards.find((board) => String(board.marketNo) === String(marketNo) || String(board.id) === String(marketNo));
+  return boards.find(
+    (board) =>
+      String(board.marketNo) === String(marketNo) ||
+      String(board.id) === String(marketNo),
+  );
 };
 
 // 화면에 보여줄 배송 상태 텍스트를 계산함.
@@ -176,7 +206,10 @@ const getItemTitle = (item, tradeInfo) => {
 
 const stripStatusTag = (title) => {
   if (!title) return "";
-  return title.replace(/^\s*\[(판매중|거래중|판매완료|예약중|배송대기|요청|진행중|취소|환불|완료)\]\s*/i, "");
+  return title.replace(
+    /^\s*\[(판매중|거래중|판매완료|예약중|배송대기|요청|진행중|취소|환불|완료)\]\s*/i,
+    "",
+  );
 };
 
 const getBoardTitleStatus = (item) => {
@@ -196,9 +229,11 @@ const hasShippingDetails = (item, tradeInfo) => {
   const shippingStatus = getShippingStatusValue(item, tradeInfo);
   return Boolean(
     invoiceNumber ||
-    (shippingStatus !== null && shippingStatus !== undefined && shippingStatus !== "") ||
+    (shippingStatus !== null &&
+      shippingStatus !== undefined &&
+      shippingStatus !== "") ||
     tradeInfo?.courierCode != null ||
-    item.courierCode != null
+    item.courierCode != null,
   );
 };
 
@@ -229,15 +264,17 @@ const SaleHistory = () => {
       }
 
       try {
-        const backendUrl = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+        const backendUrl =
+          import.meta.env.VITE_BACKSERVER ||
+          "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
         const res = await axios.get(`${backendUrl}/api/store/trades`, {
           params: { sellerId: memberId },
         });
         const items = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data.items)
-          ? res.data.items
-          : [];
+            ? res.data.items
+            : [];
         setSalesHistory(items);
       } catch (error) {
         console.error("판매내역 서버 조회 실패:", error);
@@ -249,7 +286,9 @@ const SaleHistory = () => {
   }, [memberId]);
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+    const backendUrl =
+      import.meta.env.VITE_BACKSERVER ||
+      "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
     const loadSellerBoards = async () => {
       if (!memberId) return;
@@ -258,11 +297,13 @@ const SaleHistory = () => {
         const items = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data?.items)
-          ? res.data.items
-          : Array.isArray(res.data?.list)
-          ? res.data.list
-          : [];
-        setSellerBoards(items.filter((board) => String(board.memberId) === String(memberId)));
+            ? res.data.items
+            : Array.isArray(res.data?.list)
+              ? res.data.list
+              : [];
+        setSellerBoards(
+          items.filter((board) => String(board.memberId) === String(memberId)),
+        );
       } catch (error) {
         console.error("판매자 게시물 조회 실패", error);
       }
@@ -310,12 +351,20 @@ const SaleHistory = () => {
       const boardKey = String(board.marketNo ?? board.id ?? "");
       const itemKey = String(item.marketNo ?? item.id ?? "");
       const activeTradeStatus = [0, 1, 2, "0", "1", "2"];
-      return boardKey && itemKey && boardKey === itemKey && activeTradeStatus.includes(item.tradeStatus);
+      return (
+        boardKey &&
+        itemKey &&
+        boardKey === itemKey &&
+        activeTradeStatus.includes(item.tradeStatus)
+      );
     });
   };
 
   const sellingItems = useMemo(
-    () => sellerBoards.filter((board) => isBoardSelling(board) && !isBoardCurrentlyTraded(board)),
+    () =>
+      sellerBoards.filter(
+        (board) => isBoardSelling(board) && !isBoardCurrentlyTraded(board),
+      ),
     [sellerBoards, salesHistory],
   );
 
@@ -348,7 +397,9 @@ const SaleHistory = () => {
           return getDisplayShippingStatusLabel(item, tradeInfo) === "배송완료";
         }
         if (item.tradeStatus === 2 || item.tradeStatus === "2") return true;
-        return getSaleStatusLabel(item.status ?? item.productStatus) === "판매완료";
+        return (
+          getSaleStatusLabel(item.status ?? item.productStatus) === "판매완료"
+        );
       }),
     [salesHistory, tradeInfoMap],
   );
@@ -371,26 +422,49 @@ const SaleHistory = () => {
     [completedItems, completedBoardFallbackItems],
   );
 
-  const sellingPageCount = Math.max(1, Math.ceil(sellingItems.length / PAGE_SIZE));
-  const deliveryWaitingPageCount = Math.max(1, Math.ceil(deliveryWaitingItems.length / PAGE_SIZE));
-  const completedPageCount = Math.max(1, Math.ceil(completedItemsWithFallback.length / PAGE_SIZE));
+  const sellingPageCount = Math.max(
+    1,
+    Math.ceil(sellingItems.length / PAGE_SIZE),
+  );
+  const deliveryWaitingPageCount = Math.max(
+    1,
+    Math.ceil(deliveryWaitingItems.length / PAGE_SIZE),
+  );
+  const completedPageCount = Math.max(
+    1,
+    Math.ceil(completedItemsWithFallback.length / PAGE_SIZE),
+  );
 
-  const visibleSellingItems = sellingItems.slice((sellingPage - 1) * PAGE_SIZE, sellingPage * PAGE_SIZE);
-  const visibleDeliveryWaitingItems = deliveryWaitingItems.slice((deliveryWaitingPage - 1) * PAGE_SIZE, deliveryWaitingPage * PAGE_SIZE);
-  const visibleCompletedItems = completedItemsWithFallback.slice((completedPage - 1) * PAGE_SIZE, completedPage * PAGE_SIZE);
+  const visibleSellingItems = sellingItems.slice(
+    (sellingPage - 1) * PAGE_SIZE,
+    sellingPage * PAGE_SIZE,
+  );
+  const visibleDeliveryWaitingItems = deliveryWaitingItems.slice(
+    (deliveryWaitingPage - 1) * PAGE_SIZE,
+    deliveryWaitingPage * PAGE_SIZE,
+  );
+  const visibleCompletedItems = completedItemsWithFallback.slice(
+    (completedPage - 1) * PAGE_SIZE,
+    completedPage * PAGE_SIZE,
+  );
 
-  const hasAnyHistory = sellingItems.length > 0 || deliveryWaitingItems.length > 0 || completedItemsWithFallback.length > 0;
+  const hasAnyHistory =
+    sellingItems.length > 0 ||
+    deliveryWaitingItems.length > 0 ||
+    completedItemsWithFallback.length > 0;
 
   useEffect(() => {
     if (sellingPage > sellingPageCount) setSellingPage(sellingPageCount);
   }, [sellingPage, sellingPageCount]);
 
   useEffect(() => {
-    if (deliveryWaitingPage > deliveryWaitingPageCount) setDeliveryWaitingPage(deliveryWaitingPageCount);
+    if (deliveryWaitingPage > deliveryWaitingPageCount)
+      setDeliveryWaitingPage(deliveryWaitingPageCount);
   }, [deliveryWaitingPage, deliveryWaitingPageCount]);
 
   useEffect(() => {
-    if (completedPage > completedPageCount) setCompletedPage(completedPageCount);
+    if (completedPage > completedPageCount)
+      setCompletedPage(completedPageCount);
   }, [completedPage, completedPageCount]);
 
   const renderPagination = (page, pageCount, onChange) => {
@@ -400,10 +474,17 @@ const SaleHistory = () => {
 
     return (
       <div className={styles.pagination}>
-        <button type="button" disabled={page === 1} onClick={() => onChange(page - 1)}>
+        <button
+          type="button"
+          disabled={page === 1}
+          onClick={() => onChange(page - 1)}
+        >
           &lt;
         </button>
-        {Array.from({ length: groupEnd - groupStart + 1 }, (_, index) => groupStart + index).map((pageNumber) => (
+        {Array.from(
+          { length: groupEnd - groupStart + 1 },
+          (_, index) => groupStart + index,
+        ).map((pageNumber) => (
           <button
             key={pageNumber}
             type="button"
@@ -413,7 +494,11 @@ const SaleHistory = () => {
             {pageNumber}
           </button>
         ))}
-        <button type="button" disabled={page === pageCount} onClick={() => onChange(page + 1)}>
+        <button
+          type="button"
+          disabled={page === pageCount}
+          onClick={() => onChange(page + 1)}
+        >
           &gt;
         </button>
       </div>
@@ -427,43 +512,61 @@ const SaleHistory = () => {
     const displayCourierCode = tradeInfo?.courierCode ?? item.courierCode;
     const displayInvoiceNumber = tradeInfo?.invoiceNumber ?? item.invoiceNumber;
     const address = item.orderInfo?.address || item.address || "";
-    const displayTradeType = resolveTradeType(item.tradeType, item.tradeTypeText, item.deliveryMethod, address || tradeInfo?.address);
-    const hasDelivery = displayTradeType === "택배" || displayTradeType === "직거래/택배";
+    const displayTradeType = resolveTradeType(
+      item.tradeType,
+      item.tradeTypeText,
+      item.deliveryMethod,
+      address || tradeInfo?.address,
+    );
+    const hasDelivery =
+      displayTradeType === "택배" || displayTradeType === "직거래/택배";
     const hasShippingInfo = hasDelivery && hasShippingDetails(item, tradeInfo);
     const linkMarketNo = marketNo;
     const board = getBoardForMarketNo(marketNo, sellerBoards);
     const displayTitle = stripStatusTag(
-      getItemTitle(item, tradeInfo) || board?.marketTitle || board?.title || board?.boardTitle || board?.marketName || ""
+      getItemTitle(item, tradeInfo) ||
+        board?.marketTitle ||
+        board?.title ||
+        board?.boardTitle ||
+        board?.marketName ||
+        "",
     );
     const displayDate = item.date
       ? new Date(item.date).toLocaleDateString("ko-KR")
       : item.createdAt
-      ? new Date(item.createdAt).toLocaleDateString("ko-KR")
-      : "-";
-    const displayAmount = Number(item.tradePrice ?? item.amount ?? item.productPrice ?? 0).toLocaleString("ko-KR");
-    const saleStatus = isDeliveryPendingTrade(item, tradeInfo) ? "배송대기" : getSaleCardStatus(item);
+        ? new Date(item.createdAt).toLocaleDateString("ko-KR")
+        : "-";
+    const displayAmount = Number(
+      item.tradePrice ?? item.amount ?? item.productPrice ?? 0,
+    ).toLocaleString("ko-KR");
+    const saleStatus = isDeliveryPendingTrade(item, tradeInfo)
+      ? "배송대기"
+      : getSaleCardStatus(item);
     // 이미지 경로를 여러 필드에서 순서대로 찾아서 사용함.
     // 판매중 / 배송대기 / 판매완료 항목 모두에서 이미지 경로를 최대한 찾도록 함.
     const imageUrl = getImageUrl(
       item.productThumb ||
-      item.boardThumb ||
-      item.thumb ||
-      item.marketThumb ||
-      item.thumbnail ||
-      (Array.isArray(item.images) && (item.images[0]?.url || item.images[0])) ||
-      tradeInfo?.productThumb ||
-      tradeInfo?.thumbnail ||
-      tradeInfo?.marketThumb ||
-      (Array.isArray(tradeInfo?.images) && (tradeInfo.images[0]?.url || tradeInfo.images[0])) ||
-      board?.productThumb ||
-      board?.thumb ||
-      board?.boardThumb ||
-      board?.marketThumb ||
-      board?.thumbnail ||
-      board?.mainImage ||
-      board?.marketImage ||
-      (Array.isArray(board?.images) && (board.images[0]?.url || board.images[0])) ||
-      board?.image
+        item.boardThumb ||
+        item.thumb ||
+        item.marketThumb ||
+        item.thumbnail ||
+        (Array.isArray(item.images) &&
+          (item.images[0]?.url || item.images[0])) ||
+        tradeInfo?.productThumb ||
+        tradeInfo?.thumbnail ||
+        tradeInfo?.marketThumb ||
+        (Array.isArray(tradeInfo?.images) &&
+          (tradeInfo.images[0]?.url || tradeInfo.images[0])) ||
+        board?.productThumb ||
+        board?.thumb ||
+        board?.boardThumb ||
+        board?.marketThumb ||
+        board?.thumbnail ||
+        board?.mainImage ||
+        board?.marketImage ||
+        (Array.isArray(board?.images) &&
+          (board.images[0]?.url || board.images[0])) ||
+        board?.image,
     );
 
     const displayTraderName = getDisplayName(item) || getDisplayName(tradeInfo);
@@ -476,8 +579,10 @@ const SaleHistory = () => {
         <div className={styles.sale_card_inner}>
           <div className={styles.sale_card_image_wrap}>
             {imageUrl ? (
-              <img                loading="lazy"
-                decoding="async"                src={imageUrl}
+              <img
+                loading="lazy"
+                decoding="async"
+                src={imageUrl}
                 alt={displayTitle}
                 className={styles.sale_card_image}
                 onError={(e) => {
@@ -489,18 +594,37 @@ const SaleHistory = () => {
             )}
           </div>
           <div className={styles.sale_card_content}>
-            <div className={styles.sale_card_title}>[{saleStatus}] {displayTitle}</div>
-            <div className={styles.sale_card_meta}>{displayDate} · {saleStatus}</div>
+            <div className={styles.sale_card_title}>
+              [{saleStatus}] {displayTitle}
+            </div>
+            <div className={styles.sale_card_meta}>
+              {displayDate} · {saleStatus}
+            </div>
             <div className={styles.sale_card_detail}>{displayAmount}원</div>
-            <div className={styles.sale_card_detail}>거래방법: {displayTradeType}</div>
-            {item.buyerId || item.buyerNickname || tradeInfo?.buyerId || tradeInfo?.buyerNickname ? (
-              <div className={styles.sale_card_buyer}>구매자: {displayTraderName}</div>
+            <div className={styles.sale_card_detail}>
+              거래방법: {displayTradeType}
+            </div>
+            {item.buyerId ||
+            item.buyerNickname ||
+            tradeInfo?.buyerId ||
+            tradeInfo?.buyerNickname ? (
+              <div className={styles.sale_card_buyer}>
+                구매자: {displayTraderName}
+              </div>
             ) : null}
             {hasShippingInfo && (
               <div className={styles.sale_card_shipping_info}>
-                <div className={styles.sale_card_detail}>배송 상태: {getDisplayShippingStatusLabel(item, tradeInfo)}</div>
-                <div className={styles.sale_card_detail}>택배사: {getCourierLabel(displayCourierCode)}</div>
-                {displayInvoiceNumber ? <div className={styles.sale_card_detail}>송장번호: {displayInvoiceNumber}</div> : null}
+                <div className={styles.sale_card_detail}>
+                  배송 상태: {getDisplayShippingStatusLabel(item, tradeInfo)}
+                </div>
+                <div className={styles.sale_card_detail}>
+                  택배사: {getCourierLabel(displayCourierCode)}
+                </div>
+                {displayInvoiceNumber ? (
+                  <div className={styles.sale_card_detail}>
+                    송장번호: {displayInvoiceNumber}
+                  </div>
+                ) : null}
               </div>
             )}
           </div>
@@ -524,11 +648,20 @@ const SaleHistory = () => {
               </div>
               {sellingItems.length > 0 ? (
                 <>
-                  <div className={styles.status_card_list}>{visibleSellingItems.map(renderSaleCard)}</div>
-                  {sellingPageCount > 1 && renderPagination(sellingPage, sellingPageCount, setSellingPage)}
+                  <div className={styles.status_card_list}>
+                    {visibleSellingItems.map(renderSaleCard)}
+                  </div>
+                  {sellingPageCount > 1 &&
+                    renderPagination(
+                      sellingPage,
+                      sellingPageCount,
+                      setSellingPage,
+                    )}
                 </>
               ) : (
-                <p className={styles.empty_section}>판매중인 거래가 없습니다.</p>
+                <p className={styles.empty_section}>
+                  판매중인 거래가 없습니다.
+                </p>
               )}
             </section>
 
@@ -539,11 +672,20 @@ const SaleHistory = () => {
               </div>
               {deliveryWaitingItems.length > 0 ? (
                 <>
-                  <div className={styles.status_card_list}>{visibleDeliveryWaitingItems.map(renderSaleCard)}</div>
-                  {deliveryWaitingPageCount > 1 && renderPagination(deliveryWaitingPage, deliveryWaitingPageCount, setDeliveryWaitingPage)}
+                  <div className={styles.status_card_list}>
+                    {visibleDeliveryWaitingItems.map(renderSaleCard)}
+                  </div>
+                  {deliveryWaitingPageCount > 1 &&
+                    renderPagination(
+                      deliveryWaitingPage,
+                      deliveryWaitingPageCount,
+                      setDeliveryWaitingPage,
+                    )}
                 </>
               ) : (
-                <p className={styles.empty_section}>배송대기 상태 상품 없습니다.</p>
+                <p className={styles.empty_section}>
+                  배송대기 상태 상품 없습니다.
+                </p>
               )}
             </section>
 
@@ -554,11 +696,20 @@ const SaleHistory = () => {
               </div>
               {completedItemsWithFallback.length > 0 ? (
                 <>
-                  <div className={styles.status_card_list}>{visibleCompletedItems.map(renderSaleCard)}</div>
-                  {completedPageCount > 1 && renderPagination(completedPage, completedPageCount, setCompletedPage)}
+                  <div className={styles.status_card_list}>
+                    {visibleCompletedItems.map(renderSaleCard)}
+                  </div>
+                  {completedPageCount > 1 &&
+                    renderPagination(
+                      completedPage,
+                      completedPageCount,
+                      setCompletedPage,
+                    )}
                 </>
               ) : (
-                <p className={styles.empty_section}>판매완료 내역이 없습니다.</p>
+                <p className={styles.empty_section}>
+                  판매완료 내역이 없습니다.
+                </p>
               )}
             </section>
           </>

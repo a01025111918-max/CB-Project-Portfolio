@@ -11,7 +11,9 @@ import Swal from "sweetalert2";
 // 스토어 상품 이미지 변환은 normalizeImageUrl에서 처리함.
 // 로컬 /board/editor 경로 대신 Firebase URL 변환을 우선함.
 
-const BACKSERVER = import.meta.env.VITE_BACKSERVER || "http://localhost:9999";
+const BACKSERVER =
+  import.meta.env.VITE_BACKSERVER ||
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
 // 중고거래 목록 페이지임.
 //  - 서버에서 판매중인 상품 목록을 받아와서 화면에 보여줌.
@@ -305,10 +307,14 @@ const Store = () => {
                                         */}
                     {imageUrl ? (
                       <img
-                        src={imageUrl}
+                        src={imageUrl || "/no-image.svg"}
                         alt={item.marketTitle || "상품 이미지"}
                         loading="lazy"
                         decoding="async"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/no-image.svg";
+                        }}
                       />
                     ) : (
                       "이미지"

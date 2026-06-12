@@ -6,7 +6,8 @@ import userImg from "../../assets/admin.png";
 import useAuthStore from "../../store/useAuthStore.js";
 import { normalizeImageUrl } from "../../utils/getImageUrl";
 import { compressImageFile } from "../../utils/compressImage";
-const BACKSERVER = "http://localhost:9999";
+const BACKSERVER =
+  "http://ec2-13-125-148-128.ap-northeast-2.compute.amazonaws.com:9999";
 
 // 서버에 저장된 썸네일 경로를 실제 이미지 URL로 변환함.
 // - 절대 URL이면 그대로 사용함.
@@ -16,7 +17,8 @@ const getImageUrl = (thumb) => normalizeImageUrl(thumb, "member/thumb");
 const MyInformation = () => {
   // 왼쪽 마이페이지 카드 컴포넌트임.
   // 회원 정보를 보여주고, 프로필 사진 변경 기능도 처리함.
-  const { memberId, memberNickname, isReady, memberThumb, setThumb } = useAuthStore();
+  const { memberId, memberNickname, isReady, memberThumb, setThumb } =
+    useAuthStore();
 
   // 서버에서 받아온 회원 정보 저장용 상태임.
   const [member, setMember] = useState();
@@ -152,7 +154,9 @@ const MyInformation = () => {
             </li>
             <li>
               <span className={styles.item_label}>조회수</span>
-              <span className={styles.item_value}>{viewCount.toLocaleString()}</span>
+              <span className={styles.item_value}>
+                {viewCount.toLocaleString()}
+              </span>
             </li>
           </ul>
         </div>
