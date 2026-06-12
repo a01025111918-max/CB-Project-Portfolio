@@ -49,7 +49,7 @@ import AdminPage from "./pages/admin/AdminPage";
 import UpdateMyInfo from "./components/mypage/UpdateMyInfo";
 import Mypage from "./pages/member/MyPage";
 import Login from "./pages/member/LoginPage";
-import FindId from "./pages/member/findId";
+import FindId from "./pages/member/FindId";
 import FindPw from "./pages/member/FindPw";
 import ResetPw from "./pages/member/ResetPw";
 import MapCommunityPage from "./pages/MapCommunityPage/MapCommunityPage";
