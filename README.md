@@ -43,6 +43,43 @@ CB-Project / 총 작업기간= 2026.3.25 - 2026.4.22 (약 30일)
 
 
 
+중요 코드 및 결제 로직
+
+
+
+
+
+
+
+
+
+
+<img width="821" height="420" alt="image" src="https://github.com/user-attachments/assets/610acb2b-2396-4f48-a72d-8417e1517e80" />
+
+
+
+
+
+
+<img width="723" height="387" alt="image" src="https://github.com/user-attachments/assets/9090fd1f-778c-4fc5-ab4d-fdecdf5914f5" />
+
+
+
+
+
+
+
+
+<img width="833" height="502" alt="image" src="https://github.com/user-attachments/assets/2b873acd-ee55-4ecb-ad3a-6fd3f2ae6ebc" />
+
+
+
+
+
+
+
+
+
 
 
 
